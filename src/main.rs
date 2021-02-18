@@ -1,3 +1,5 @@
+use std::io::{self, Write};
+
 fn main() {
     let width: i32 = 256;
     let height: i32 = 256;
@@ -9,6 +11,9 @@ fn main() {
     let width_f64: f64 = width.into();
     let height_f64: f64 = height.into();
     for y in (0..height).rev() {
+        eprint!("\rrow remaining {}    ", y);
+        io::stderr().flush().unwrap();
+
         let y: f64 = y.into();
 
         for x in 0..width {
@@ -25,4 +30,7 @@ fn main() {
             println!("{} {} {}", r, g, b);
         }
     }
+
+    eprintln!("");
+    eprintln!("done!");
 }
