@@ -1,7 +1,7 @@
 mod vec3;
 
 use std::io::{self, Write};
-use vec3::Vec3;
+use vec3::{Color};
 
 fn main() {
     let width: i32 = 256;
@@ -22,7 +22,7 @@ fn main() {
         for x in 0..width {
             let x: f64 = x.into();
 
-            let pixel: Vec3 = Vec3::new(x / width_f64, y / height_f64, 0.25);
+            let pixel: Color = Color::new(x / width_f64, y / height_f64, 0.25);
 
             let (r, g, b) = pixel.get_i32();
 
