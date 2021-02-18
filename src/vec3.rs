@@ -1,3 +1,4 @@
+#[derive(Clone, Copy)]
 pub struct Vec3 {
     pub v0: f64, // R or X
     pub v1: f64, // G or Y
@@ -20,6 +21,50 @@ impl Vec3 {
             (255.999 * self.v2) as i32,
         )
     }
+
+    pub fn add(&self, v: Vec3) -> Vec3 {
+        Vec3 {
+            v0: self.v0 + v.v0,
+            v1: self.v1 + v.v1,
+            v2: self.v2 + v.v2,
+        }
+    }
+
+    pub fn sub(&self, v: Vec3) -> Vec3 {
+        Vec3 {
+            v0: self.v0 - v.v0,
+            v1: self.v1 - v.v1,
+            v2: self.v2 - v.v2,
+        }
+    }
+
+    pub fn mul_value(&self, v: f64) -> Vec3 {
+        Vec3 {
+            v0: self.v0 * v,
+            v1: self.v1 * v,
+            v2: self.v2 * v,
+        }
+    }
+
+    pub fn div_value(&self, v: f64) -> Vec3 {
+        Vec3 {
+            v0: self.v0 / v,
+            v1: self.v1 / v,
+            v2: self.v2 / v,
+        }
+    }
+
+    pub fn length(&self) -> f64 {
+        let v0 = self.v0 * self.v0;
+        let v1 = self.v1 * self.v1;
+        let v2 = self.v2 * self.v2;
+        (v0 + v1 + v2).sqrt()
+    }
+
+    pub fn unit(&self) -> Vec3 {
+        self.div_value(self.length())
+    }
 }
 
 pub type Color = Vec3;
+pub type Point3 = Vec3;
