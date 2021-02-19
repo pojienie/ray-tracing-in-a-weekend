@@ -15,15 +15,15 @@ impl Hittable for Sphere {
     fn hit(&self, ray: &Ray) -> f64 {
         let oc: Vec3 = ray.origin.sub(self.center);
 
-        let a = Vec3::dot(ray.direction, ray.direction);
-        let b = Vec3::dot(oc, ray.direction) * 2.0;
-        let c = Vec3::dot(oc, oc) - self.radius * self.radius;
-        let discriminant = b * b - 4.0 * a * c;
+        let a = ray.direction.length_squared();
+        let half_b = Vec3::dot(oc, ray.direction);
+        let c = oc.length_squared() - self.radius * self.radius;
+        let discriminant = half_b * half_b - a * c;
 
         if discriminant < 0.0 {
             return -1.0;
         }
 
-        (-b - discriminant.sqrt()) / (2.0 * a)
+        (-half_b - discriminant.sqrt()) / a
     }
 }

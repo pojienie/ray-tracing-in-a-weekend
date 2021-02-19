@@ -61,6 +61,13 @@ impl Vec3 {
         (v0 + v1 + v2).sqrt()
     }
 
+    pub fn length_squared(&self) -> f64 {
+        let v0 = self.v0 * self.v0;
+        let v1 = self.v1 * self.v1;
+        let v2 = self.v2 * self.v2;
+        v0 + v1 + v2
+    }
+
     pub fn unit(&self) -> Vec3 {
         self.div_value(self.length())
     }
