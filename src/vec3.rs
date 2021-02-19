@@ -64,6 +64,13 @@ impl Vec3 {
     pub fn unit(&self) -> Vec3 {
         self.div_value(self.length())
     }
+
+    pub fn dot(v: Vec3, u: Vec3) -> f64 {
+        let v0 = v.v0 * u.v0;
+        let v1 = v.v1 * u.v1;
+        let v2 = v.v2 * u.v2;
+        v0 + v1 + v2
+    }
 }
 
 pub type Color = Vec3;

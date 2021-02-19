@@ -1,11 +1,17 @@
+mod hittable;
 mod ray;
 mod vec3;
 
+use hittable::{Hittable, Sphere};
 use ray::Ray;
 use std::io::{self, Write};
 use vec3::{Color, Point3, Vec3};
 
-fn ray_color(ray: &Ray) -> Color {
+fn ray_color(ray: &Ray, sphere: Sphere) -> Color {
+    if sphere.hit(ray) {
+        return Color::new(1.0, 0.0, 0.0);
+    }
+
     let unit_direction: Vec3 = ray.direction.unit();
     let t: f64 = 0.5 * (unit_direction.v1 + 1.0);
 
@@ -21,6 +27,13 @@ fn main() {
     let width_f64: f64 = width.into();
     let height_f64: f64 = width_f64 / aspect_ratio;
     let height: i32 = height_f64 as i32;
+
+    let center: Point3 = Point3::new(0.0, 0.0, -1.0);
+    let radius: f64 = 0.5;
+    let sphere: Sphere = Sphere {
+        center: center,
+        radius: radius,
+    };
 
     // camera
     let viewport_height: f64 = 2.0;
@@ -56,7 +69,7 @@ fn main() {
                 .add(vertical.mul_value(v))
                 .sub(origin);
             let ray: Ray = Ray::new(origin, p);
-            let pixel: Color = ray_color(&ray);
+            let pixel: Color = ray_color(&ray, sphere);
 
             let (r, g, b) = pixel.get_i32();
 
