@@ -8,8 +8,10 @@ use std::io::{self, Write};
 use vec3::{Color, Point3, Vec3};
 
 fn ray_color(ray: &Ray, sphere: Sphere) -> Color {
-    if sphere.hit(ray) {
-        return Color::new(1.0, 0.0, 0.0);
+    let t: f64 = sphere.hit(ray);
+    if t > 0.0 {
+        let n: Vec3 = ray.at(t).sub(Vec3::new(0.0, 0.0, -1.0));
+        return Color::new(n.v0 + 1.0, n.v1 + 1.0, n.v2 + 1.0).mul_value(0.5);
     }
 
     let unit_direction: Vec3 = ray.direction.unit();

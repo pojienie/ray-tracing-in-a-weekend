@@ -9,4 +9,8 @@ impl Ray {
     pub fn new(origin: Point3, direction: Vec3) -> Ray {
         Ray { origin, direction }
     }
+
+    pub fn at(&self, t: f64) -> Vec3 {
+        self.origin.add(self.direction.mul_value(t))
+    }
 }
