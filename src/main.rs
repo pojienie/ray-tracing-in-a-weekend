@@ -2,15 +2,29 @@ mod hittable;
 mod ray;
 mod vec3;
 
-use hittable::{Hittable, Sphere};
+use hittable::{HitRecord, Hittable, Sphere};
 use ray::Ray;
 use std::io::{self, Write};
+use std::vec::Vec;
 use vec3::{Color, Point3, Vec3};
 
-fn ray_color(ray: &Ray, hittable: &impl Hittable) -> Color {
-    let t: f64 = hittable.hit(ray);
-    if t > 0.0 {
-        let n: Vec3 = ray.at(t).sub(Vec3::new(0.0, 0.0, -1.0));
+fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>) -> Color {
+    let mut hit_record: HitRecord = HitRecord::new();
+    let mut closest_t: f64 = std::f64::INFINITY;
+    let mut hit_anything: bool = false;
+
+    for hittable in hittables {
+        let mut temp_hit_record: HitRecord = HitRecord::new();
+        let hit: bool = hittable.hit(ray, 0.0, closest_t, &mut temp_hit_record);
+        if hit {
+            hit_anything = true;
+            closest_t = hit_record.t;
+            hit_record = temp_hit_record;
+        }
+    }
+
+    if hit_anything {
+        let n: Vec3 = hit_record.normal;
         return Color::new(n.v0 + 1.0, n.v1 + 1.0, n.v2 + 1.0).mul_value(0.5);
     }
 
@@ -30,12 +44,22 @@ fn main() {
     let height_f64: f64 = width_f64 / aspect_ratio;
     let height: i32 = height_f64 as i32;
 
+    // world
     let center: Point3 = Point3::new(0.0, 0.0, -1.0);
     let radius: f64 = 0.5;
-    let sphere: Sphere = Sphere {
+    let sphere1: Sphere = Sphere {
         center: center,
         radius: radius,
     };
+
+    let center: Point3 = Point3::new(0.0, -100.5, -1.0);
+    let radius: f64 = 100.0;
+    let sphere2: Sphere = Sphere {
+        center: center,
+        radius: radius,
+    };
+
+    let spheres = vec![sphere1, sphere2];
 
     // camera
     let viewport_height: f64 = 2.0;
@@ -71,7 +95,7 @@ fn main() {
                 .add(vertical.mul_value(v))
                 .sub(origin);
             let ray: Ray = Ray::new(origin, p);
-            let pixel: Color = ray_color(&ray, &sphere);
+            let pixel: Color = ray_color(&ray, &spheres);
 
             let (r, g, b) = pixel.get_i32();
 

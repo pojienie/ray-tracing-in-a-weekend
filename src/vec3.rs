@@ -38,6 +38,14 @@ impl Vec3 {
         }
     }
 
+    pub fn neg(&self) -> Vec3 {
+        Vec3 {
+            v0: -self.v0,
+            v1: -self.v1,
+            v2: -self.v2,
+        }
+    }
+
     pub fn mul_value(&self, v: f64) -> Vec3 {
         Vec3 {
             v0: self.v0 * v,
