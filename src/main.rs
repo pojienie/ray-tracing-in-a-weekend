@@ -9,6 +9,7 @@ use ray::Ray;
 use std::io::{self, Write};
 use std::vec::Vec;
 use vec3::{Color, Point3, Vec3};
+use rand::prelude::*;
 
 fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>) -> Color {
     let mut hit_record: HitRecord = HitRecord::new();
@@ -45,6 +46,7 @@ fn main() {
     let width_f64: f64 = width.into();
     let height_f64: f64 = width_f64 / aspect_ratio;
     let height: i32 = height_f64 as i32;
+    let samples_per_pixel = 100;
 
     // world
     let center: Point3 = Point3::new(0.0, 0.0, -1.0);
@@ -66,6 +68,9 @@ fn main() {
     // camera
     let camera = Camera::new();
 
+    // random
+    let mut rng = rand::thread_rng();
+
     // render
     println!("P3");
     println!("{} {}", width, height);
@@ -79,11 +84,18 @@ fn main() {
         for x in 0..width {
             let x: f64 = x.into();
 
-            let u: f64 = x / (width_f64 - 1.0);
-            let v: f64 = y / (height_f64 - 1.0);
+            let mut pixel: Color = Color::new(0.0, 0.0, 0.0);
+            for _i in 0..samples_per_pixel {
+                let du:f64 = rng.gen();
+                let dv:f64 = rng.gen();
 
-            let ray: Ray = camera.get_ray(u, v);
-            let pixel: Color = ray_color(&ray, &spheres);
+                let u: f64 = (x + du) / (width_f64 - 1.0);
+                let v: f64 = (y + dv) / (height_f64 - 1.0);
+
+                let ray: Ray = camera.get_ray(u, v);
+                pixel = pixel.add(ray_color(&ray, &spheres));
+            }
+            pixel = pixel.div_value(samples_per_pixel.into());
 
             let (r, g, b) = pixel.get_i32();
 
