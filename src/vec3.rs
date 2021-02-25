@@ -1,3 +1,5 @@
+use rand::prelude::*;
+
 #[derive(Clone, Copy)]
 pub struct Vec3 {
     pub v0: f64, // R or X
@@ -11,6 +13,24 @@ impl Vec3 {
             v0: v0,
             v1: v1,
             v2: v2,
+        }
+    }
+
+    pub fn random() -> Vec3 {
+        let mut rng = rand::thread_rng();
+        Vec3 {
+            v0: rng.gen(),
+            v1: rng.gen(),
+            v2: rng.gen(),
+        }
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let v: Vec3 = Vec3::random();
+            if v.length_squared() < 1.0 {
+                return v;
+            }
         }
     }
 

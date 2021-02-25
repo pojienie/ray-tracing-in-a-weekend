@@ -5,13 +5,17 @@ mod vec3;
 
 use camera::Camera;
 use hittable::{HitRecord, Hittable, Sphere};
+use rand::prelude::*;
 use ray::Ray;
 use std::io::{self, Write};
 use std::vec::Vec;
 use vec3::{Color, Point3, Vec3};
-use rand::prelude::*;
 
-fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>) -> Color {
+fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>, depth: i32) -> Color {
+    if depth == 0 {
+        return Color::new(0.0, 0.0, 0.0);
+    }
+
     let mut hit_record: HitRecord = HitRecord::new();
     let mut closest_t: f64 = std::f64::INFINITY;
     let mut hit_anything: bool = false;
@@ -27,8 +31,12 @@ fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>) -> Color {
     }
 
     if hit_anything {
-        let n: Vec3 = hit_record.normal;
-        return Color::new(n.v0 + 1.0, n.v1 + 1.0, n.v2 + 1.0).mul_value(0.5);
+        let r = Vec3::random_in_unit_sphere();
+
+        let target: Point3 = hit_record.p.add(hit_record.normal).add(r);
+        let ray2: Ray = Ray::new(hit_record.p, target.sub(hit_record.p));
+        let color: Color = ray_color(&ray2, hittables, depth - 1);
+        return color.mul_value(0.5);
     }
 
     let unit_direction: Vec3 = ray.direction.unit();
@@ -40,6 +48,8 @@ fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>) -> Color {
 }
 
 fn main() {
+    let max_depth: i32 = 50;
+
     // image
     let aspect_ratio: f64 = 16.0 / 9.0;
     let width: i32 = 400;
@@ -86,14 +96,14 @@ fn main() {
 
             let mut pixel: Color = Color::new(0.0, 0.0, 0.0);
             for _i in 0..samples_per_pixel {
-                let du:f64 = rng.gen();
-                let dv:f64 = rng.gen();
+                let du: f64 = rng.gen();
+                let dv: f64 = rng.gen();
 
                 let u: f64 = (x + du) / (width_f64 - 1.0);
                 let v: f64 = (y + dv) / (height_f64 - 1.0);
 
                 let ray: Ray = camera.get_ray(u, v);
-                pixel = pixel.add(ray_color(&ray, &spheres));
+                pixel = pixel.add(ray_color(&ray, &spheres, max_depth));
             }
             pixel = pixel.div_value(samples_per_pixel.into());
 
