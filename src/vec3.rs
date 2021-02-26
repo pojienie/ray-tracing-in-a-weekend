@@ -114,6 +114,34 @@ impl Vec3 {
             v2: self.v2.sqrt(),
         }
     }
+
+    pub fn clamp(&self, min: f64, max: f64) -> Vec3 {
+        let v0 = if self.v0 < min {
+            min
+        } else if self.v0 > max {
+            max
+        } else {
+            self.v0
+        };
+
+        let v1 = if self.v1 < min {
+            min
+        } else if self.v1 > max {
+            max
+        } else {
+            self.v1
+        };
+
+        let v2 = if self.v2 < min {
+            min
+        } else if self.v2 > max {
+            max
+        } else {
+            self.v2
+        };
+
+        Vec3::new(v0, v1, v2)
+    }
 }
 
 pub type Color = Vec3;
