@@ -106,6 +106,14 @@ impl Vec3 {
         let v2 = v.v2 * u.v2;
         v0 + v1 + v2
     }
+
+    pub fn sqrt(&self) -> Vec3 {
+        Vec3 {
+            v0: self.v0.sqrt(),
+            v1: self.v1.sqrt(),
+            v2: self.v2.sqrt(),
+        }
+    }
 }
 
 pub type Color = Vec3;

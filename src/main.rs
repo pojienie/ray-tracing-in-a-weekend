@@ -107,7 +107,7 @@ fn main() {
             }
             pixel = pixel.div_value(samples_per_pixel.into());
 
-            let (r, g, b) = pixel.get_i32();
+            let (r, g, b) = pixel.sqrt().get_i32();
 
             println!("{} {} {}", r, g, b);
         }
