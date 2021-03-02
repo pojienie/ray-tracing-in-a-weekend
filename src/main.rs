@@ -4,7 +4,7 @@ mod material;
 mod ray;
 mod vec3;
 
-use crate::material::Lambertian;
+use crate::material::{Lambertian, Metal};
 use camera::Camera;
 use hittable::{HitRecord, Hittable, Sphere};
 use rand::prelude::*;
@@ -33,9 +33,13 @@ fn ray_color<'a>(ray: &Ray, hittables: &Vec<impl Hittable<'a>>, depth: i32) -> C
     }
 
     if hit_anything {
-        let (attenuation, ray2) = hit_record.material.scatter(ray, &hit_record);
-        let color: Color = ray_color(&ray2, hittables, depth - 1);
-        return color.mul(attenuation);
+        return match hit_record.material.scatter(ray, &hit_record) {
+            Some((attenuation, ray2)) => {
+                let color: Color = ray_color(&ray2, hittables, depth - 1);
+                return color.mul(attenuation);
+            }
+            None => Color::new(0.0, 0.0, 0.0),
+        };
     }
 
     let unit_direction: Vec3 = ray.direction.unit();
@@ -58,7 +62,7 @@ fn main() {
     let samples_per_pixel = 100;
 
     // world
-    let material = Lambertian::new(Color::new(1.0, 0.0, 0.0));
+    let material = Lambertian::new(Color::new(0.7, 0.3, 0.3));
     let center: Point3 = Point3::new(0.0, 0.0, -1.0);
     let radius: f64 = 0.5;
     let sphere1: Sphere = Sphere {
@@ -67,16 +71,34 @@ fn main() {
         material: &material,
     };
 
-    let material = Lambertian::new(Color::new(0.0, 0.0, 1.0));
-    let center: Point3 = Point3::new(0.0, -100.5, -1.0);
-    let radius: f64 = 100.0;
+    let material = Metal::new(Color::new(0.8, 0.8, 0.8));
+    let center: Point3 = Point3::new(-1.0, 0.0, -1.0);
+    let radius: f64 = 0.5;
     let sphere2: Sphere = Sphere {
         center: center,
         radius: radius,
         material: &material,
     };
 
-    let spheres = vec![sphere1, sphere2];
+    let material = Metal::new(Color::new(0.8, 0.6, 0.2));
+    let center: Point3 = Point3::new(1.0, 0.0, -1.0);
+    let radius: f64 = 0.5;
+    let sphere3: Sphere = Sphere {
+        center: center,
+        radius: radius,
+        material: &material,
+    };
+
+    let material = Lambertian::new(Color::new(0.8, 0.8, 0.0));
+    let center: Point3 = Point3::new(0.0, -100.5, -1.0);
+    let radius: f64 = 100.0;
+    let sphere4: Sphere = Sphere {
+        center: center,
+        radius: radius,
+        material: &material,
+    };
+
+    let spheres = vec![sphere1, sphere2, sphere3, sphere4];
 
     // camera
     let camera = Camera::new();
