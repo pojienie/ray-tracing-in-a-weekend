@@ -1,0 +1,3 @@
+following https://raytracing.github.io/books/RayTracingInOneWeekend.html
+
+This actually has some bug but I don't know how to debug......
