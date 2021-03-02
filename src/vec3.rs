@@ -34,6 +34,10 @@ impl Vec3 {
         }
     }
 
+    pub fn random_unit_vector() -> Vec3 {
+        Vec3::random_in_unit_sphere().unit()
+    }
+
     pub fn get_i32(&self) -> (i32, i32, i32) {
         (
             (255.999 * self.v0) as i32,

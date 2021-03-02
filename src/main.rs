@@ -31,7 +31,7 @@ fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>, depth: i32) -> Color {
     }
 
     if hit_anything {
-        let r = Vec3::random_in_unit_sphere();
+        let r = Vec3::random_unit_vector();
 
         let target: Point3 = hit_record.p.add(hit_record.normal).add(r);
         let ray2: Ray = Ray::new(hit_record.p, target.sub(hit_record.p));
