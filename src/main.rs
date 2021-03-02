@@ -22,7 +22,7 @@ fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>, depth: i32) -> Color {
 
     for hittable in hittables {
         let mut temp_hit_record: HitRecord = HitRecord::new();
-        let hit: bool = hittable.hit(ray, 0.0, closest_t, &mut temp_hit_record);
+        let hit: bool = hittable.hit(ray, 0.001, closest_t, &mut temp_hit_record);
         if hit {
             hit_anything = true;
             closest_t = hit_record.t;
