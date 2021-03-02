@@ -1,8 +1,10 @@
 mod camera;
 mod hittable;
+mod material;
 mod ray;
 mod vec3;
 
+use crate::material::Lambertian;
 use camera::Camera;
 use hittable::{HitRecord, Hittable, Sphere};
 use rand::prelude::*;
@@ -11,16 +13,7 @@ use std::io::{self, Write};
 use std::vec::Vec;
 use vec3::{Color, Point3, Vec3};
 
-fn random_in_hemisphere(normal: Vec3) -> Vec3 {
-    let random_unit_vector: Vec3 = Vec3::random_unit_vector();
-    if Vec3::dot(normal, random_unit_vector) > 0.0 {
-        random_unit_vector
-    } else {
-        random_unit_vector.neg()
-    }
-}
-
-fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>, depth: i32) -> Color {
+fn ray_color<'a>(ray: &Ray, hittables: &Vec<impl Hittable<'a>>, depth: i32) -> Color {
     if depth == 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
@@ -40,12 +33,9 @@ fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>, depth: i32) -> Color {
     }
 
     if hit_anything {
-        let r = random_in_hemisphere(hit_record.normal);
-
-        let target: Point3 = hit_record.p.add(hit_record.normal).add(r);
-        let ray2: Ray = Ray::new(hit_record.p, target.sub(hit_record.p));
+        let (attenuation, ray2) = hit_record.material.scatter(ray, &hit_record);
         let color: Color = ray_color(&ray2, hittables, depth - 1);
-        return color.mul_value(0.5);
+        return color.mul(attenuation);
     }
 
     let unit_direction: Vec3 = ray.direction.unit();
@@ -68,18 +58,22 @@ fn main() {
     let samples_per_pixel = 100;
 
     // world
+    let material = Lambertian::new(Color::new(1.0, 0.0, 0.0));
     let center: Point3 = Point3::new(0.0, 0.0, -1.0);
     let radius: f64 = 0.5;
     let sphere1: Sphere = Sphere {
         center: center,
         radius: radius,
+        material: &material,
     };
 
+    let material = Lambertian::new(Color::new(0.0, 0.0, 1.0));
     let center: Point3 = Point3::new(0.0, -100.5, -1.0);
     let radius: f64 = 100.0;
     let sphere2: Sphere = Sphere {
         center: center,
         radius: radius,
+        material: &material,
     };
 
     let spheres = vec![sphere1, sphere2];

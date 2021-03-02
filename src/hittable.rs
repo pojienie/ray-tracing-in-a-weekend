@@ -1,20 +1,23 @@
+use crate::material::{Material, EMPTY_MATERIAL};
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub p: Point3,
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
+    pub material: &'a dyn Material,
 }
 
-impl HitRecord {
-    pub fn new() -> HitRecord {
+impl<'a> HitRecord<'a> {
+    pub fn new() -> HitRecord<'a> {
         HitRecord {
             p: Point3::new(0.0, 0.0, 0.0),
             normal: Vec3::new(0.0, 0.0, 0.0),
             t: 0.0,
             front_face: true,
+            material: &EMPTY_MATERIAL,
         }
     }
 
@@ -28,18 +31,18 @@ impl HitRecord {
     }
 }
 
-pub trait Hittable {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
+pub trait Hittable<'a> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord<'a>) -> bool;
 }
 
-#[derive(Clone, Copy)]
-pub struct Sphere {
+pub struct Sphere<'a> {
     pub center: Point3,
     pub radius: f64,
+    pub material: &'a dyn Material,
 }
 
-impl Hittable for Sphere {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+impl<'b, 'a: 'b> Hittable<'b> for Sphere<'a> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord<'b>) -> bool {
         let oc: Vec3 = ray.origin.sub(self.center);
 
         let a = ray.direction.length_squared();
@@ -66,6 +69,7 @@ impl Hittable for Sphere {
         rec.p = ray.at(rec.t);
         let outward_normal: Vec3 = rec.p.sub(self.center).div_value(self.radius);
         rec.set_face_normal(ray, outward_normal);
+        rec.material = self.material;
 
         true
     }
