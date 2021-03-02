@@ -11,6 +11,15 @@ use std::io::{self, Write};
 use std::vec::Vec;
 use vec3::{Color, Point3, Vec3};
 
+fn random_in_hemisphere(normal: Vec3) -> Vec3 {
+    let random_unit_vector: Vec3 = Vec3::random_unit_vector();
+    if Vec3::dot(normal, random_unit_vector) > 0.0 {
+        random_unit_vector
+    } else {
+        random_unit_vector.neg()
+    }
+}
+
 fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>, depth: i32) -> Color {
     if depth == 0 {
         return Color::new(0.0, 0.0, 0.0);
@@ -31,7 +40,7 @@ fn ray_color(ray: &Ray, hittables: &Vec<impl Hittable>, depth: i32) -> Color {
     }
 
     if hit_anything {
-        let r = Vec3::random_unit_vector();
+        let r = random_in_hemisphere(hit_record.normal);
 
         let target: Point3 = hit_record.p.add(hit_record.normal).add(r);
         let ray2: Ray = Ray::new(hit_record.p, target.sub(hit_record.p));
